@@ -15,6 +15,7 @@ include(CMakePackageConfigHelpers)
 set(TREELAND_PROTOCOL_XML_FILES
   public/treeland-capture-unstable-v1.xml
   public/treeland-dde-shell-v1.xml
+  public/treeland-window-animation-v1.xml
 )
 
 # DDE component protocol XML files
