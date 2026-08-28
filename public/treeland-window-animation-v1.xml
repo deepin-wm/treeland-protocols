@@ -53,10 +53,13 @@
            closed.
         10. When B's window is closed, the compositor plays the close
             animation from the window geometry back to the rectangle.
-        11. If A destroys the rect object before B's window is closed (or if
+        11. Once B's window is destroyed, the compositor sends the closed
+            event on the rect object. A destroys the rect object after
+            receiving this event.
+        12. If A destroys the rect object before B's window is closed (or if
             A's client disconnects, or if the originating surface is
             destroyed), the compositor falls back to its default close
-            animation.
+            animation and does not send the closed event.
 
         Timing and responsibilities:
 
@@ -140,6 +143,32 @@
                 window is closed.
             </description>
         </request>
+
+        <event name="closed">
+            <description summary="the target window has been destroyed">
+                Sent once the target window associated with this rectangle has
+                been destroyed. From this point the compositor no longer
+                references this rectangle, so the object is useless to the
+                client and SHOULD be destroyed.
+
+                This is a notification only: the rectangle is created by and
+                owned by the client, and the client remains responsible for
+                destroying it via the destroy request. The compositor never
+                destroys client objects. A client that creates a rectangle per
+                long-lived target window can reuse the rectangle for further
+                target windows; a client that creates a new rectangle for each
+                target window SHOULD destroy the rectangle upon receiving this
+                event so it does not accumulate rectangles for windows that are
+                already gone.
+
+                This event is sent at most once per rectangle object, and only
+                if the target window was destroyed while the rectangle object
+                was still alive. If the client destroys the rectangle (or
+                disconnects) before the target window is destroyed, this event
+                is not sent. No further events are delivered on this object
+                after closed.
+            </description>
+        </event>
 
         <request name="set_geometry">
             <description summary="set the rectangle geometry">
